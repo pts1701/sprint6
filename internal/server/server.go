@@ -8,11 +8,13 @@ import (
 	"github.com/Yandex-Practicum/go1fl-sprint6-final/internal/handlers"
 )
 
+// создание структуры Server
 type Server struct {
 	Logger     *log.Logger
 	HttpServer *http.Server
 }
 
+// функция принимает логгер и возвращает сервер
 func MyServer(log *log.Logger) *Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlers.MainHandle)
