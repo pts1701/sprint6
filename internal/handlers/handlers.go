@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -13,21 +12,23 @@ import (
 	"github.com/Yandex-Practicum/go1fl-sprint6-final/internal/service"
 )
 
-func MainHandle(res http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodGet {
-		data, err := os.ReadFile("..\\index.html")
-		if err != nil {
-			log.Fatal(err)
-		}
-		res.Write(data)
-	} else if req.Method != http.MethodGet {
-		http.Error(res, "Internal server error", http.StatusInternalServerError)
+func MainHandle(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if r.Method != http.MethodGet {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-
+	data, err := os.ReadFile("..\\index.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+	w.Write(data)
 }
 
 func UploadHandle(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
 	if r.Method != http.MethodPost {
 		http.Error(w, "method must be POST", http.StatusInternalServerError)
 		return
@@ -55,25 +56,18 @@ func UploadHandle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := service.ConvMorse(string(fileContent)) // результат конвертации
-
-	//fmt.Println(result)
-
-	//создаем директорию "result" для хранения файлов с результатом
-	err = os.Mkdir("..//result", 0755)
-	if err != nil && !errors.Is(err, os.ErrExist) {
-		log.Fatal(err)
+	result, err := service.ConvMorse(string(fileContent)) // результат конвертации
+	if err != nil {
+		http.Error(w, "Failed to convert file content", http.StatusInternalServerError)
 	}
 
-	//создаем файл с результатом и сохраняем в директорию "result"
-
-	curTime := time.Now().Local().Format("2006-01-02_15-04-05") //строка с временем создания файла, для названия
+	curTime := time.Now().UTC().Format("2006-01-02_15-04-05") //строка с временем создания файла, для названия
 	ext := filepath.Ext(header.Filename)
 
 	filename := fmt.Sprintf("%s_result_%s%s", header.Filename, curTime, ext) // название файла
 
 	//создание файла с результатом
-	resultFilepath := filepath.Join("..//result", filename) //путь для сохранения нового файла "путь/имя_файла"
+	resultFilepath := filepath.Join("..", filename) //путь для сохранения нового файла "путь/имя_файла"
 
 	resultFile, err := os.Create(resultFilepath) //создание файла - результата обработки
 	if err != nil {
@@ -89,12 +83,6 @@ func UploadHandle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//тестирование выходных данных
-	/*fmt.Println(fileContent)
-	testing, err := os.ReadFile(resultFilepath)
-	if err != nil {
-		return
-	}
-	fmt.Println(string(testing))*/
+	fmt.Fprintf(w, result)
 
 }

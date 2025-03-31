@@ -15,7 +15,7 @@ type Server struct {
 }
 
 // функция принимает логгер и возвращает сервер
-func MyServer(log *log.Logger) *Server {
+func NewServer(log *log.Logger) *Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlers.MainHandle)
 	mux.HandleFunc("/upload", handlers.UploadHandle)

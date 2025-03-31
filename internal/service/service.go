@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/Yandex-Practicum/go1fl-sprint6-final/pkg/morse"
@@ -32,17 +33,17 @@ func canMorse(s string) bool {
 }
 
 // функция проверяет контент и конвертирует его соответственно, либо возвращает ошибку
-func ConvMorse(input string) string {
+func ConvMorse(input string) (string, error) {
 
 	switch {
 	case isMorse(input):
-		return morse.ToText(input)
+		return morse.ToText(input), nil
 
 	case canMorse(input):
-		return morse.ToMorse(input)
+		return morse.ToMorse(input), nil
 
 	default:
-		return "Incorrect input data"
+		return "", fmt.Errorf("Incorrect input data")
 	}
 
 }

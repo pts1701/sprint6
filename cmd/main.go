@@ -11,7 +11,7 @@ func main() {
 
 	logger := log.New(os.Stdout, "INFO: ", log.LstdFlags)
 
-	srv := server.MyServer(logger)
+	srv := server.NewServer(logger)
 
 	err := srv.HttpServer.ListenAndServe()
 	if err != nil {
